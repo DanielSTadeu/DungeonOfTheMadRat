@@ -12,13 +12,14 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;
+    [SerializeField] private Camera cam;
     // Update is called once per frame
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
 
-        Flip();
+        //Flip();
     }
 
     private void FixedUpdate()
@@ -31,9 +32,31 @@ public class PlayerController : MonoBehaviour
         else if (vertical != 0)
         {
             animator.SetFloat("Speed", Math.Abs(vertical));
-        }else
+        }
+        else
         {
             animator.SetFloat("Speed", 0f);
+        }
+        FlipAtMouse();
+    }
+
+    private void FlipAtMouse()
+    {
+        Vector2 mousePos = Input.mousePosition;
+        int screenWidth = Screen.width / 2;
+        if (mousePos.x > screenWidth && !isFacingRight)
+        {
+            isFacingRight = true;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
+        }
+        else if (mousePos.x < screenWidth && isFacingRight)
+        {
+            isFacingRight = false;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
         }
     }
 
