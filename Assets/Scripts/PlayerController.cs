@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
             animator.SetFloat("Speed", 0f);
         }
         FlipAtMouse();
+        Flip();
     }
 
     private void FlipAtMouse()

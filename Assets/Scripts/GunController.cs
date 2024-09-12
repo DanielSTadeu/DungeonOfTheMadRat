@@ -4,32 +4,56 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
-    private Rigidbody2D _body2D;
-    [SerializeField] private Rigidbody2D playerRb;
+    [SerializeField] private float gunDistance = 0.5f;
+    [SerializeField] private float timer;
+    [SerializeField] private GameObject bullet;
+    [SerializeField] private Transform bulletTransform;
+    [SerializeField] private float timeBetweenFiring;
+    private bool canFire;
+    private Transform playerTransform;
+    private Camera mainCam;
 
     // Start is called before the first frame update
     void Start()
     {
-        _body2D = GetComponent<Rigidbody2D>();
+        mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
-
-    private void FixedUpdate()
-    {
-        //_body2D.transform.position = playerRb.transform.position;
         AimAtMouse();
+        FireGun();
     }
 
     private void AimAtMouse()
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
         Vector3 direction = mousePos - transform.position;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle + 90);
+        Vector3 playerPosCorrected = playerTransform.position + new Vector3(0,0.5f,0);
+        transform.position = playerPosCorrected + Quaternion.Euler(0, 0, angle) * new Vector3(gunDistance, 0, 0);
+    }
 
-       
+    private void FireGun()
+    {
+        if (!canFire)
+        {
+            timer += Time.deltaTime;
+            if (timer > timeBetweenFiring)
+            {
+                canFire = true;
+                timer = 0;
+            }
+        }
+
+
+        if (Input.GetMouseButton(0) && canFire)
+        {
+            canFire = false;
+            Instantiate(bullet, bulletTransform.position, Quaternion.identity);
+        }
     }
 }
